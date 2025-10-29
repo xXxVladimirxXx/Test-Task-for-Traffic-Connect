@@ -64,7 +64,11 @@ class SiteService
 
         DB::transaction(function () use ($request, $data, $site, $faker) {
             if ($request->boolean('create_server')) {
-                $server = Server::create(['name' => $faker->company]);
+                $server = Server::create([
+                    'name' => $faker->domainWord() . '-server',
+                    'ip'   => $faker->ipv4(),
+                    'port' => $faker->randomNumber(4, true),
+                ]);
                 $data['server_id'] = $server->id;
 
                 $server->credential()->create([
@@ -74,7 +78,11 @@ class SiteService
             }
 
             if ($request->boolean('create_cdn')) {
-                $cdn = Cdn::create(['name' => $faker->domainName]);
+                $cdn = Cdn::create([
+                    'name'     => strtoupper($faker->domainWord()) . ' CDN',
+                    'provider' => $faker->company(),
+                    'api_key'  => Str::random(32)
+                ]);
                 $data['cdn_id'] = $cdn->id;
 
                 $cdn->credential()->create([
